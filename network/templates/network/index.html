@@ -1,5 +1,32 @@
 {% extends "network/layout.html" %}
+{% load static %}
 
 {% block body %}
-    TODO
+    <div class="w-100 text-center pt-3">
+        <button type="button" id="new-post-modal-button" class="btn btn-secondary w-50 rounded-pill" data-bs-toggle="modal" data-bs-target="#newPostModal">
+            New Post
+        </button>
+        <div class="modal fade" id="newPostModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">New Post</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <textarea rows="10" class="form-control" id="new-post-content" placeholder="What is happening?"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="new-post-button" class="btn btn-secondary w-100">Post</button>
+                    <div id="new-post-validation" class="w-100"></div>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    <script src="{% static 'network/api.js' %}"></script>
+    <script src="{% static 'network/posts.js' %}"></script>
 {% endblock %}
