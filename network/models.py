@@ -30,7 +30,8 @@ class Post(Entity):
             "user": self.user.serialize(),
             "userId": self.user.pk,
             "content": self.content,
-            "timestamp": self.date_creation
+            "timestamp": self.date_creation,
+            "likes": len(self.likes.all())
         }
 
 

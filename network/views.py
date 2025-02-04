@@ -91,8 +91,17 @@ def post(request):
 
 @login_required
 def post_all(request):
+    start = int(request.GET.get("start") or 0)
+    end = start + 9
+
     if request.method != 'GET':
         return JsonResponse({"error": "Method not allowed."}, status=405)
 
     posts = Post.objects.all()
+    posts = sorted(posts, key=lambda x: x.date_creation, reverse=True)
+    if len(posts) < end:
+        posts = posts[start:]
+    else:
+        posts = posts[start:end]
+
     return JsonResponse([post.serialize() for post in posts], safe=False)
