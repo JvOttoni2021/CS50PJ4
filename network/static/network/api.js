@@ -28,3 +28,17 @@ async function get_posts(start = 0) {
         throw error;
     });
 }
+
+async function get_user(user_id) {
+    return fetch(`/users/${user_id}`, {
+        method: 'GET'
+    })
+    .then(response => response.json())
+    .then(result => {
+        return result;
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        throw error;
+    });
+}

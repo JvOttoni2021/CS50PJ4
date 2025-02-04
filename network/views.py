@@ -105,3 +105,23 @@ def post_all(request):
         posts = posts[start:end]
 
     return JsonResponse([post.serialize() for post in posts], safe=False)
+
+
+@csrf_exempt
+@login_required
+def user(request, id):
+    if request.method != "GET":
+        return JsonResponse({"error": "Method not allowed."}, status=405)
+    
+    try:
+        id = int(id)
+    except:
+        return JsonResponse({"error": "Bad Request."}, status=400)
+
+    try:
+        user = User.objects.get(pk=id)
+    except:
+        return JsonResponse({"error": "Not found."}, status=404)
+    data = user.serialize()
+    data['own_user'] = user == request.user
+    return JsonResponse(data)

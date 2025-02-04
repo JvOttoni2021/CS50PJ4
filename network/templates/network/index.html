@@ -2,33 +2,38 @@
 {% load static %}
 
 {% block body %}
-    <div class="w-100 pt-3" id="posts">
-        <div class="d-block w-50 mx-auto my-3">
-            <button type="button" id="new-post-modal-button" class="btn btn-primary w-100 rounded-pill" data-bs-toggle="modal" data-bs-target="#newPostModal">
-                New Post
-            </button>
+    <div id="all-posts-page" class="page">
+        <div class="w-100 pt-3" id="posts">
+            <div class="d-block w-50 mx-auto my-3">
+                <button type="button" id="new-post-modal-button" class="btn btn-primary w-100 rounded-pill" data-bs-toggle="modal" data-bs-target="#newPostModal">
+                    New Post
+                </button>
+            </div>
         </div>
-    </div>
-    <div class="modal fade" id="newPostModal" tabindex="-1" aria-labelledby="ModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="ModalLabel">New Post</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <textarea rows="10" class="form-control" id="new-post-content" placeholder="What is happening?"></textarea>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" id="new-post-button" class="btn btn-secondary w-100">Post</button>
-                    <div id="new-post-validation" class="w-100"></div>
+        <div class="modal fade" id="newPostModal" tabindex="-1" aria-labelledby="ModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="ModalLabel">New Post</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <textarea rows="10" class="form-control" id="new-post-content" placeholder="What is happening?"></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" id="new-post-button" class="btn btn-secondary w-100">Post</button>
+                        <div id="new-post-validation" class="w-100"></div>
+                    </div>
                 </div>
             </div>
         </div>
+    </div>
+    <div id="profile-page" class="page">
     </div>
 {% endblock %}
 
 {% block script %}
     <script src="{% static 'network/api.js' %}"></script>
     <script src="{% static 'network/posts.js' %}"></script>
+    <script src="{% static 'network/dynamic_page_content.js' %}"></script>
 {% endblock %}
