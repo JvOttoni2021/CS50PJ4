@@ -3,22 +3,22 @@ from django.db import models
 
 
 class User(AbstractUser):
-    pass
-    def serialize(self):
+    def serialize(self, id):
         return {
             "id": self.pk,
             "date_joined": self.date_joined,
             "username": self.username,
             "follows": len(self.follows.all()),
             "followers": len(self.followers.all()),
-            "posts": [post.serialize() for post in sorted(self.posts.all(), key=lambda x: x.date_creation, reverse=True)]
+            "posts": [post.serialize(id) for post in sorted(self.posts.all(), key=lambda x: x.date_creation, reverse=True)]
         }
 
 
-    def serialize_post(self):
+    def serialize_post(self, id):
         return {
             "id": self.pk,
-            "user": self.username
+            "user": self.username,
+            "own_user": id == self.pk
         }
     
 
@@ -35,10 +35,10 @@ class Post(Entity):
     user = models.ForeignKey(User, on_delete=models.PROTECT, related_name='posts', null=False)
     content = models.CharField(max_length=255, null=False)
 
-    def serialize(self):
+    def serialize(self, user_id):
         return {
             "id": self.pk,
-            "user": self.user.serialize_post(),
+            "user": self.user.serialize_post(user_id),
             "content": self.content,
             "timestamp": self.date_creation,
             "likes": len(self.likes.all()),
@@ -54,6 +54,9 @@ class Like(Entity):
 class Follow(Entity):
     user_followed = models.ForeignKey(User, on_delete=models.PROTECT, related_name='followers', null=False)
     user_follower = models.ForeignKey(User, on_delete=models.PROTECT, related_name='follows', null=False)
+
+    def __str__(self):
+        return f'{self.user_follower} - {self.user_followed}'
 
 
 class Comment(Entity):

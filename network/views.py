@@ -8,7 +8,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
 
-from .models import User, Post
+from .models import User, Post, Follow
 
 
 def index(request):
@@ -89,22 +89,53 @@ def post(request):
     return JsonResponse({"message": "Post created."}, status=201)
 
 
+@csrf_exempt
 @login_required
-def post_all(request):
+def follow(request, user_id):
+    if request.user.pk == user_id:
+        return JsonResponse({"error": "Cannot follow your own user."}, status=400)
+
+    if request.method != 'POST':
+        return JsonResponse({"error": "Method not allowed."}, status=405)
+
+    try:
+        followed_user = User.objects.get(pk=int(user_id))
+    except:
+        return JsonResponse({"error": "User not found."}, status=404)
+    
+    try:
+        already_follow = Follow.objects.filter(user_followed=followed_user, user_follower=request.user).first()
+        if already_follow is not None:
+            already_follow.delete()
+            return JsonResponse({"message": "User unfollowed."}, status=200)
+    except:
+        pass
+
+    follow_entity = Follow(user_followed=followed_user, user_follower=request.user)
+    follow_entity.save()
+    return JsonResponse({"message": "User followed."}, status=201)
+
+
+def post_all(request, filter):
     start = int(request.GET.get("start") or 0)
     end = start + 9
 
     if request.method != 'GET':
         return JsonResponse({"error": "Method not allowed."}, status=405)
 
-    posts = Post.objects.all()
+    if filter == 'all':
+        posts = Post.objects.all()
+    elif filter == 'following':
+        print("teste")
+        following = [following.user_followed for following in Follow.objects.all().filter(user_follower=request.user)]
+        posts = Post.objects.filter(user__in=following)
     posts = sorted(posts, key=lambda x: x.date_creation, reverse=True)
     if len(posts) < end:
         posts = posts[start:]
     else:
         posts = posts[start:end]
 
-    return JsonResponse([post.serialize() for post in posts], safe=False)
+    return JsonResponse([post.serialize(request.user.pk) for post in posts], safe=False)
 
 
 @csrf_exempt
@@ -122,6 +153,7 @@ def user(request, id):
         user = User.objects.get(pk=id)
     except:
         return JsonResponse({"error": "Not found."}, status=404)
-    data = user.serialize()
+    data = user.serialize(request.user.id)
     data['own_user'] = user == request.user
+    data['following'] = len(user.followers.all().filter(user_follower=request.user)) > 0
     return JsonResponse(data)

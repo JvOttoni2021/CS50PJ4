@@ -3,12 +3,14 @@
 
 {% block body %}
     <div id="all-posts-page" class="page">
-        <div class="w-100 pt-3" id="posts">
-            <div class="d-block w-50 mx-auto my-3">
-                <button type="button" id="new-post-modal-button" class="btn btn-primary w-100 rounded-pill" data-bs-toggle="modal" data-bs-target="#newPostModal">
-                    New Post
-                </button>
-            </div>
+        <div class="w-100" id="posts">
+            {% if user.is_authenticated %}
+                <div class="d-block w-50 mx-auto my-3">
+                    <button type="button" id="new-post-modal-button" class="btn btn-primary w-100 rounded-pill" data-bs-toggle="modal" data-bs-target="#newPostModal">
+                        New Post
+                    </button>
+                </div>
+            {% endif %}
         </div>
         <div class="modal fade" id="newPostModal" tabindex="-1" aria-labelledby="ModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-xl">
@@ -27,6 +29,8 @@
                 </div>
             </div>
         </div>
+    </div>
+    <div id="following-posts-page" class="page">
     </div>
     <div id="profile-page" class="page">
     </div>
