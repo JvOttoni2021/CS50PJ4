@@ -1,6 +1,5 @@
 
 document.addEventListener('DOMContentLoaded', async function() {
-    let start = 0;
 
     await load_posts(page="all", 0, "all-posts-page");
     document.querySelector("#new-post-button").addEventListener('click', () => new_post());
@@ -8,9 +7,55 @@ document.addEventListener('DOMContentLoaded', async function() {
     document.querySelector("#following-posts-nav").addEventListener('click', () => open_following_posts());
     const new_post_button = document.querySelector("#new-post-modal-button");
     if (!new_post_button === undefined) {
-        document.querySelector("#new-post-modal-button").addEventListener('click', () => clear_new_post())
+        document.querySelector("#new-post-modal-button").addEventListener('click', () => clear_new_post());
     }
+    // document.querySelectorAll(".edit-btn").forEach(button => {
+    //     button.addEventListener("click", function() {
+    //         let cardBody = this.closest(".card-body"); // Get the parent card-body
+    //         let postBody = cardBody.querySelector(".post-body"); // Find the post body
+
+    //         if (this.textContent === "Edit") {
+    //             let originalText = postBody.textContent.trim();
+
+    //             postBody.innerHTML = `<textarea class="form-control post-textarea">${originalText}</textarea>`;
+
+    //             this.textContent = "Save";
+    //         } else {
+    //             let updatedText = cardBody.querySelector(".post-textarea").value.trim();
+
+    //             postBody.innerHTML = updatedText;
+
+    //             this.textContent = "Edit";
+    //         }
+    //     });
+    // });
 });
+
+async function handle_edit_click(button, post_id) {
+    let cardBody = button.closest(".card-body");
+    let postBody = cardBody.querySelector(".post-body");
+
+    if (button.textContent === "Edit") {
+        let originalText = postBody.textContent.trim();
+
+        postBody.innerHTML = `<textarea class="form-control post-textarea">${originalText}</textarea>`;
+
+        button.textContent = "Save";
+    } else {
+        let updatedText = cardBody.querySelector(".post-textarea").value.trim();
+
+        const response = await put_post(post_id, updatedText);
+
+        if (response.error !== undefined) {
+            alert(response.error);
+            return;
+        }
+
+        postBody.innerHTML = updatedText;
+
+        button.textContent = "Edit";
+    }
+}
 
 function open_all_posts() {
     hide_pages();
@@ -62,7 +107,7 @@ async function load_posts(page, start, div_id) {
     const posts = await get_posts(page=page, start=start);
 
     const posts_len = posts.length;
-    const posts_per_page = 4;
+    const posts_per_page = 5;
 
     const page_count = Math.ceil(posts_len/posts_per_page);
     let body;
@@ -83,9 +128,9 @@ async function load_posts(page, start, div_id) {
 
             if ((index + 1) % posts_per_page === 0) {
                 current_page = current_page + 1;
-                body = body + '</div>'
+                body = body + '</div>';
                 if (posts_len !== index + 1) {
-                    body = body + `<div class="page-${div_id}-pagination" id="posts-${div_id}-${current_page}">`
+                    body = body + `<div class="page-${div_id}-pagination" id="posts-${div_id}-${current_page}">`;
                 }
             }
         }
@@ -100,7 +145,6 @@ async function load_posts(page, start, div_id) {
         shows_pagination(1, div_id);
     }
 }
-
 
 async function show_profile(user_id) {
     hide_pages();

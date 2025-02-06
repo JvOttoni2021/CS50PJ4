@@ -56,3 +56,20 @@ async function post_follow(user_id) {
         throw error;
     });
 }
+
+async function put_post(post_id, new_content) {
+    return fetch(`/posts/${post_id}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+            content: new_content
+        })
+    })
+    .then(response => response.json())
+    .then(result => {
+        return result;
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        throw error;
+    });
+}

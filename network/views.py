@@ -151,3 +151,31 @@ def user(request, id):
     data['own_user'] = user == request.user
     data['following'] = len(user.followers.all().filter(user_follower=request.user)) > 0
     return JsonResponse(data)
+
+
+@csrf_exempt
+@login_required
+def put_post(request, post_id):
+    if request.method != 'PUT':
+        return JsonResponse({"error": "Method not allowed."}, status=405)
+        
+    try:
+        updated_post = Post.objects.get(id=int(post_id))
+    except:
+        return JsonResponse({"error": "Post not found."}, status=404)
+
+    if updated_post.user != request.user:
+        return JsonResponse({"error": "Unauthorized."}, status=401)
+
+    data = json.loads(request.body)
+    new_content = data.get("content", "")
+
+    if new_content == "":
+        return JsonResponse({"error": "Invalid post content."}, status=422)
+    
+    if len(new_content) > 255:
+        return JsonResponse({"error": "Post len must be less than 255 characters."}, status=422)
+    
+    updated_post.content = new_content
+    updated_post.save()
+    return JsonResponse({"message": "Post updated."}, status=200)

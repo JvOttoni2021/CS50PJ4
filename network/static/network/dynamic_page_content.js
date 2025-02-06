@@ -2,8 +2,8 @@ const BODY_POST =  ' \
 <div class="card border-primary mb-3 d-block w-50 mx-auto"> \
     <div class="card-header btn w-100 text-start" onclick="show_profile(\'#USER_ID#\')">#USERNAME#</div> \
     <div class="card-body text-secondary"> \
-        <button class="btn btn-primary btn-sm" #SHOW_BUTTON#>Edit</button> \
-        <div class="my-2 text-black">#POSTBODY#</div> \
+        <button class="btn btn-primary btn-sm edit-btn" onclick="handle_edit_click(this, #POST_ID#)" #SHOW_BUTTON#>Edit</button> \
+        <div class="my-2 text-black post-body">#POSTBODY#</div> \
         <small>#TIMESTAMP#</small> \
         <div class="mb-2"> \
             <svg xmlns"http://www.w3.org/2000/svg" width="16" height="16" fill="red" class="bi bi-suit-heart" viewBox="0 0 16 16"> \
@@ -22,6 +22,7 @@ function get_body(post) {
     }
     
     let replace_values = {
+        "#POST_ID#": post.id,
         "#USER_ID#": post.user.id,
         "#USERNAME#": post.user.user,
         "#POSTBODY#": post.content,
