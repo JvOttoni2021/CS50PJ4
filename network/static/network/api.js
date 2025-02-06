@@ -57,6 +57,20 @@ async function post_follow(user_id) {
     });
 }
 
+async function post_like(post_id) {
+    return fetch(`/like/${post_id}`, {
+        method: 'POST'
+    })
+    .then(response => response.json())
+    .then(result => {
+        return result;
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        throw error;
+    });
+}
+
 async function put_post(post_id, new_content) {
     return fetch(`/posts/${post_id}`, {
         method: 'PUT',

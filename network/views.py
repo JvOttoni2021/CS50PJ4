@@ -8,7 +8,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
 
-from .models import User, Post, Follow
+from .models import User, Post, Follow, Like
 
 
 def index(request):
@@ -92,12 +92,12 @@ def post(request):
 @csrf_exempt
 @login_required
 def follow(request, user_id):
-    if request.user.pk == user_id:
-        return JsonResponse({"error": "Cannot follow your own user."}, status=400)
-
     if request.method != 'POST':
         return JsonResponse({"error": "Method not allowed."}, status=405)
-
+    
+    if request.user.pk == user_id:
+        return JsonResponse({"error": "Cannot follow your own user."}, status=400)
+    
     try:
         followed_user = User.objects.get(pk=int(user_id))
     except:
@@ -116,7 +116,33 @@ def follow(request, user_id):
     return JsonResponse({"message": "User followed."}, status=201)
 
 
-def post_all(request, filter):
+
+@csrf_exempt
+@login_required
+def like(request, post_id):
+
+    if request.method != 'POST':
+        return JsonResponse({"error": "Method not allowed."}, status=405)
+
+    try:
+        post = Post.objects.get(id=int(post_id))
+    except:
+        return JsonResponse({"error": "User not found."}, status=404)
+    
+    try:
+        already_liked = Like.objects.filter(post=post, user=request.user).first()
+        if already_liked is not None:
+            already_liked.delete()
+            return JsonResponse({"message": "Post unliked."}, status=200)
+    except:
+        pass
+
+    like_entity = Like(post=post, user=request.user)
+    like_entity.save()
+    return JsonResponse({"message": "Post liked."}, status=201)
+
+
+def get_posts(request, filter):
 
     if request.method != 'GET':
         return JsonResponse({"error": "Method not allowed."}, status=405)
@@ -124,7 +150,6 @@ def post_all(request, filter):
     if filter == 'all':
         posts = Post.objects.all()
     elif filter == 'following':
-        print("teste")
         following = [following.user_followed for following in Follow.objects.all().filter(user_follower=request.user)]
         posts = Post.objects.filter(user__in=following)
     posts = sorted(posts, key=lambda x: x.date_creation, reverse=True)

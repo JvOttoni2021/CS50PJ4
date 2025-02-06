@@ -42,7 +42,8 @@ class Post(Entity):
             "content": self.content,
             "timestamp": self.date_creation,
             "likes": len(self.likes.all()),
-            "comments": [comment.serialize() for comment in self.comments.all()]
+            "comments": [comment.serialize() for comment in self.comments.all()],
+            "liked": len(Like.objects.all().filter(user__pk=user_id, post=self)) > 0
         }
 
 

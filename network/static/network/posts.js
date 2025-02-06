@@ -9,26 +9,6 @@ document.addEventListener('DOMContentLoaded', async function() {
     if (!new_post_button === undefined) {
         document.querySelector("#new-post-modal-button").addEventListener('click', () => clear_new_post());
     }
-    // document.querySelectorAll(".edit-btn").forEach(button => {
-    //     button.addEventListener("click", function() {
-    //         let cardBody = this.closest(".card-body"); // Get the parent card-body
-    //         let postBody = cardBody.querySelector(".post-body"); // Find the post body
-
-    //         if (this.textContent === "Edit") {
-    //             let originalText = postBody.textContent.trim();
-
-    //             postBody.innerHTML = `<textarea class="form-control post-textarea">${originalText}</textarea>`;
-
-    //             this.textContent = "Save";
-    //         } else {
-    //             let updatedText = cardBody.querySelector(".post-textarea").value.trim();
-
-    //             postBody.innerHTML = updatedText;
-
-    //             this.textContent = "Edit";
-    //         }
-    //     });
-    // });
 });
 
 async function handle_edit_click(button, post_id) {
@@ -55,6 +35,32 @@ async function handle_edit_click(button, post_id) {
 
         button.textContent = "Edit";
     }
+}
+
+
+async function handle_like_click(button, post_id) {
+    let cardBody = button.closest(".card-body");
+    let likeCount = cardBody.querySelector(".likes-count");
+    let like_icon = cardBody.querySelector(".like-icon");
+
+    if (likeCount.dataset.liked === "true") {
+        let new_count = parseInt(likeCount.innerHTML) - 1;
+        console.log(new_count);
+        console.log(likeCount.innerHTML);
+        likeCount.innerHTML = new_count;
+        
+        like_icon.innerHTML = UNLIKED_POST;
+        likeCount.dataset.liked = "false";
+    } else {
+        let new_count = parseInt(likeCount.innerHTML) + 1;
+        console.log(new_count);
+        console.log(likeCount.innerHTML);
+        likeCount.textContent = new_count;
+        
+        like_icon.innerHTML = LIKED_POST;
+        likeCount.dataset.liked = "true";
+    }
+    await post_like(post_id);
 }
 
 function open_all_posts() {
