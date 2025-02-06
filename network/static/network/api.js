@@ -15,8 +15,8 @@ async function post_new_post(content) {
     });
 }
 
-async function get_posts(page = "all", start = 0) {
-    return fetch(`/posts/${page}?start=${start}`, {
+async function get_posts(page = "all") {
+    return fetch(`/posts/${page}`, {
         method: 'GET'
     })
     .then(response => response.json())

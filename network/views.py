@@ -117,8 +117,6 @@ def follow(request, user_id):
 
 
 def post_all(request, filter):
-    start = int(request.GET.get("start") or 0)
-    end = start + 9
 
     if request.method != 'GET':
         return JsonResponse({"error": "Method not allowed."}, status=405)
@@ -130,10 +128,6 @@ def post_all(request, filter):
         following = [following.user_followed for following in Follow.objects.all().filter(user_follower=request.user)]
         posts = Post.objects.filter(user__in=following)
     posts = sorted(posts, key=lambda x: x.date_creation, reverse=True)
-    if len(posts) < end:
-        posts = posts[start:]
-    else:
-        posts = posts[start:end]
 
     return JsonResponse([post.serialize(request.user.pk) for post in posts], safe=False)
 

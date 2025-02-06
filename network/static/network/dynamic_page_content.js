@@ -82,3 +82,27 @@ function get_body_user(user) {
 
     return formatted_return;
 }
+
+const BODY_PAGINATOR = ' \
+ <nav aria-label="Page navigation example" class="d-block w-50 mx-auto"> \
+  <div id="current-#DIV_ID#-page" class="d-none">1</div> \
+  <ul class="pagination"> \
+    <li class="page-item"><a class="page-link" href="#" onclick="previous_next(\'previous\', \'#DIV_ID#\')">Previous</a></li> \
+    #LI_PAGES# \
+    <li class="page-item"><a class="page-link" href="#" onclick="previous_next(\'next\', \'#DIV_ID#\')">Next</a></li> \
+  </ul> \
+</nav>\
+'
+
+
+function get_paginator(pages_count, div_id) {
+    let body_return = BODY_PAGINATOR;
+    let pages_lis = '';
+    for(let i = 1; i <= pages_count; i++) {
+        pages_lis = pages_lis + `<li class="page-item"><a class="page-link" onclick="shows_pagination(${i}, \'${div_id}\');" href="#">${i}</a></li>`;
+    }
+    body_return = body_return.replace('#LI_PAGES#', pages_lis);
+    body_return = body_return.replaceAll('#DIV_ID#', div_id);
+
+    return body_return;
+}

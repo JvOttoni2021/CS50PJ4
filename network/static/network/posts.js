@@ -30,15 +30,75 @@ function hide_pages() {
     });
 }
 
+function previous_next(action, div_id) {
+    let current_page = parseInt(document.querySelector(`#current-${div_id}-page`).innerHTML);
+    let new_page_number = 0;
+    if (action === "previous") {
+        if (current_page > 1) {
+            new_page_number = current_page - 1;
+        }
+    }
+    else {
+        
+        if (current_page < document.querySelectorAll(`.page-${div_id}-pagination`).length) {
+            new_page_number = current_page + 1;
+        }
+    }
+
+    if (new_page_number === 0) return;
+
+    shows_pagination(new_page_number, div_id);
+    document.querySelector(`#current-${div_id}-page`).innerHTML = new_page_number;
+}
+
+function shows_pagination(index, div_id){
+    document.querySelectorAll(`.page-${div_id}-pagination`).forEach(element => {
+        element.style.display = "none";
+    });
+    document.querySelector(`#posts-${div_id}-${index}`).style.display = "block";
+}
+
 async function load_posts(page, start, div_id) {
     const posts = await get_posts(page=page, start=start);
 
-    let body = "";
-    posts.forEach(element => {
-        body = body + get_body(element);
-    });
+    const posts_len = posts.length;
+    const posts_per_page = 4;
+
+    const page_count = Math.ceil(posts_len/posts_per_page);
+    let body;
+    if (page_count <= 1) {
+
+        body = '';
+    
+        posts.forEach(element => {
+            body = body + get_body(element);
+        });
+    }
+    else {
+        const paginator_nav = get_paginator(page_count, div_id);
+        body = paginator_nav + `<div class="page-${div_id}-pagination" id="posts-${div_id}-1">`;
+        let current_page = 1;
+        for (let index = 0; index < posts_len; index++) {
+            body = body + get_body(posts[index]);
+
+            if ((index + 1) % posts_per_page === 0) {
+                current_page = current_page + 1;
+                body = body + '</div>'
+                if (posts_len !== index + 1) {
+                    body = body + `<div class="page-${div_id}-pagination" id="posts-${div_id}-${current_page}">`
+                }
+            }
+        }
+
+        if (!body.endsWith('</div>')) {
+            body = body + '</div>'
+        }
+    }
 
     document.querySelector("#" + div_id).innerHTML = document.querySelector("#" + div_id).innerHTML + body;
+    if (page_count > 1) {
+        shows_pagination(1, div_id);
+    }
 }
 
 
