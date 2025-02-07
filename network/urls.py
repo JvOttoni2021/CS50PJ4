@@ -12,6 +12,7 @@ urlpatterns = [
     # API ROUTES
     path("posts", views.post, name="post"),
     path("posts/<int:post_id>", views.put_post, name="put_post"),
+    path("posts/comments", views.post_comment, name="post_comment"),
     path("follow/<int:user_id>", views.follow, name="follow"),
     path("like/<int:post_id>", views.like, name="like"),
     path("posts/<str:filter>", views.get_posts, name="post_all"),

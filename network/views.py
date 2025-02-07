@@ -8,7 +8,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
 
-from .models import User, Post, Follow, Like
+from .models import User, Post, Follow, Like, Comment
 
 
 def index(request):
@@ -149,8 +149,10 @@ def get_posts(request, filter):
 
     if filter == 'all':
         posts = Post.objects.all()
+
     elif filter == 'following':
         following = [following.user_followed for following in Follow.objects.all().filter(user_follower=request.user)]
+
         posts = Post.objects.filter(user__in=following)
     posts = sorted(posts, key=lambda x: x.date_creation, reverse=True)
 
@@ -204,3 +206,27 @@ def put_post(request, post_id):
     updated_post.content = new_content
     updated_post.save()
     return JsonResponse({"message": "Post updated."}, status=200)
+
+
+@csrf_exempt
+@login_required
+def post_comment(request):
+    if request.method != 'POST':
+        return JsonResponse({"error": "Method not allowed."}, status=405)
+    
+    data = json.loads(request.body)
+    content = data.get("content", "")
+    user = request.user
+    post_id = data.get("post_id", "")
+
+    if content == "":
+        return JsonResponse({"error": "Content must not be empty."}, status=422)
+
+    try: 
+        post = Post.objects.get(id=int(post_id))
+    except:
+        return JsonResponse({"error": "Post not found."}, status=404)
+    
+    new_comment = Comment(user=user, post=post, content=content)
+    new_comment.save()
+    return JsonResponse({"message": "Comment created."}, status=201)

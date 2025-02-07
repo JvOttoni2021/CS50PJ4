@@ -9,8 +9,8 @@ const LIKED_POST = '\
 </svg>'
 
 const BODY_POST =  ' \
-<div class="card border-primary mb-3 d-block w-50 mx-auto"> \
-    <div class="card-header btn w-100 text-start" onclick="show_profile(\'#USER_ID#\')">#USERNAME#</div> \
+<div class="card border-primary mb-3 d-block mx-auto"> \
+    <div class="card-header card-header-link btn w-100 text-start" onclick="show_profile(\'#USER_ID#\')">#USERNAME#</div> \
     <div class="card-body text-secondary"> \
         <button class="btn btn-primary btn-sm edit-btn" onclick="handle_edit_click(this, #POST_ID#)" #SHOW_BUTTON#>Edit</button> \
         <div class="my-2 text-black post-body">#POSTBODY#</div> \
@@ -19,7 +19,19 @@ const BODY_POST =  ' \
             <span class="like-icon">#LIKE_ICON#</span> \
             <span class="likes-count" data-liked="#LIKE_DATA#">#LIKES#</span> \
         </div> \
-        <button class="btn btn-primary btn-sm">Comment</button> \
+        <p class="d-inline-flex gap-1"> \
+        <button class="btn btn-primary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target=".multi-collapse#POST_ID#" aria-expanded="false" aria-controls="multiCollapseExample#POST_ID#">Comments</button> \
+        </p> \
+        <div class="col"> \
+            <div class="comments">\
+                #COMMENTS#\
+            </div> \
+            <div class="collapse multi-collapse#POST_ID#" id="multiCollapseExample#POST_ID#"> \
+                <div class="d-flex"> \
+                    <input type="text" class="new-comment-input form-control" placeholder="Type something..."><button class="btn btn-primary btn-sm btn-submit-comment" onclick="add_comment(this, #POST_ID#);">Submit</button> \
+                </div> \
+            </div> \
+        </div> \
     </div> \
 </div>'
 
@@ -33,17 +45,25 @@ function get_body(post) {
     if (post.liked) {
         icon = LIKED_POST;
     }
+
+    let comments = "";
+
+    post.comments.forEach(element => {
+        console.log("teste");
+        comments = comments + get_formatted_comment(element.username, element.content, post.id);
+    });
     
     let replace_values = {
         "#POST_ID#": post.id,
         "#USER_ID#": post.user.id,
         "#USERNAME#": post.user.user,
         "#POSTBODY#": post.content,
-        "#TIMESTAMP#": post.timestamp,
+        "#TIMESTAMP#": format_date_time(post.timestamp),
         "#SHOW_BUTTON#": show_button,
         "#LIKES#": post.likes,
         "#LIKE_DATA#": post.liked,
         "#LIKE_ICON#": icon,
+        "#COMMENTS#": comments
     }
 
     let formatted_return = BODY_POST;
@@ -57,7 +77,7 @@ function get_body(post) {
 
 const PROFILE_BODY = ' \
 <div class="d-none" id="loaded-profile">#USER_ID#</div> \
-<div class="card border-primary my-2 d-block w-50 mx-auto"> \
+<div class="card border-primary my-2 d-block mx-auto"> \
     <h5 class="card-header">User\'s Profile</h5> \
     <div class="card-body text-secondary" id="profile-card-"> \
         <h5 class="card-title">#USERNAME#</h5>\
@@ -85,7 +105,7 @@ function get_body_user(user) {
         "#USERNAME#": user.username,
         "#FOLLOWERS#": user.followers,
         "#FOLLOWS#": user.follows,
-        "#DATE_JOINED#": user.date_joined,
+        "#DATE_JOINED#": format_date_time(user.date_joined),
         "#SHOW_BUTTON#": show_button,
         "#BUTTON_TEXT#": button_text,
     }
@@ -121,4 +141,49 @@ function get_paginator(pages_count, div_id) {
     body_return = body_return.replaceAll('#DIV_ID#', div_id);
 
     return body_return;
+}
+
+function format_date_time(datetimeString) {
+    const date = new Date(datetimeString);
+
+    const options = { 
+        month: 'long', 
+        day: 'numeric', 
+        year: 'numeric', 
+        hour: 'numeric', 
+        minute: '2-digit', 
+        hour12: true,
+        timeZone: 'UTC'
+    };
+
+    return date.toLocaleDateString('en-US', options);
+}
+
+
+const COMMENT_BODY = ' \
+<div class="col mb-1"> \
+    <div class="collapse multi-collapse#POST_ID# #SHOW#" id="multiCollapseExample#POST_ID#"> \
+    <div class="card card-body" style="width: 100% !important; padding: 10px 15px !important;"> \
+        <strong>#USERNAME#</strong>\
+        #CONTENT#. \
+    </div> \
+    </div> \
+</div>'
+
+function get_formatted_comment(username, content, post_id, show = "") {
+
+    let replace_values = {
+        "#USERNAME#": username,
+        "#CONTENT#": content,
+        "#POST_ID#": post_id,
+        "#SHOW#": show
+    }
+
+    let formatted_return = COMMENT_BODY;
+
+    for (let [key, value] of Object.entries(replace_values)) {
+        formatted_return = formatted_return.replaceAll(key, value);
+    }
+
+    return formatted_return;
 }

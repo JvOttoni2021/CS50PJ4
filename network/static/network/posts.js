@@ -4,14 +4,31 @@ document.addEventListener('DOMContentLoaded', async function() {
     await load_posts(page="all", 0, "all-posts-page");
     document.querySelector("#new-post-button").addEventListener('click', () => new_post());
     document.querySelector("#all-posts-nav").addEventListener('click', () => open_all_posts());
-    document.querySelector("#following-posts-nav").addEventListener('click', () => open_following_posts());
+    document.body.addEventListener("click", event => {
+        if (event.target.classList.contains("btn")) {
+            check_login();
+        }
+    });
     const new_post_button = document.querySelector("#new-post-modal-button");
     if (!new_post_button === undefined) {
         document.querySelector("#new-post-modal-button").addEventListener('click', () => clear_new_post());
     }
+    const nav = document.querySelector("#following-posts-nav");
+    
+    if (!nav === undefined) {
+        document.querySelector("#following-posts-nav").addEventListener('click', () => open_following_posts());
+    }
 });
 
+function check_login() {
+    let username = document.querySelector(".username_authenticated");
+    if (username === null) {
+        window.location.href = "/login";
+    }
+}
+
 async function handle_edit_click(button, post_id) {
+    check_login();
     let cardBody = button.closest(".card-body");
     let postBody = cardBody.querySelector(".post-body");
 
@@ -37,8 +54,8 @@ async function handle_edit_click(button, post_id) {
     }
 }
 
-
 async function handle_like_click(button, post_id) {
+    check_login();
     let cardBody = button.closest(".card-body");
     let likeCount = cardBody.querySelector(".likes-count");
     let like_icon = cardBody.querySelector(".like-icon");
@@ -99,7 +116,6 @@ function previous_next(action, div_id) {
     if (new_page_number === 0) return;
 
     shows_pagination(new_page_number, div_id);
-    document.querySelector(`#current-${div_id}-page`).innerHTML = new_page_number;
 }
 
 function shows_pagination(index, div_id){
@@ -107,6 +123,7 @@ function shows_pagination(index, div_id){
         element.style.display = "none";
     });
     document.querySelector(`#posts-${div_id}-${index}`).style.display = "block";
+    document.querySelector(`#current-${div_id}-page`).innerHTML = index;
 }
 
 async function load_posts(page, start, div_id) {
@@ -181,7 +198,7 @@ async function new_post() {
     }
     clear_new_post();
     document.querySelector("#new-post-validation").className = "w-100 p-2 mb-1 text-bg-success rounded-3";
-    document.querySelector("#new-post-validation").innerHTML = response.message;
+    window.location.href = "/";
 }
 
 function clear_new_post() {
@@ -205,4 +222,21 @@ async function handle_follow(button, user_id) {
     }
     followers_object.innerHTML = amount_followers;
     button.innerHTML = new_inner_html;
+}
+
+async function add_comment(button, post_id) {
+    let cardBody = button.closest(".card-body");
+    let input = cardBody.querySelector(".new-comment-input");
+    let comments = cardBody.querySelector(".comments");
+    let username = document.querySelector(".username_authenticated")
+    if (username !== null) username = username.innerHTML;
+
+    const response = await post_comment(post_id, input.value);
+
+    if (response.error !== undefined) {
+        alert(response.error);
+        return;
+    }
+    comments.innerHTML = comments.innerHTML + get_formatted_comment(username, input.value, post_id, "show");
+    input.value = "";
 }

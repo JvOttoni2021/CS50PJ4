@@ -69,5 +69,6 @@ class Comment(Entity):
         return {
             "id": self.pk,
             "user": self.user.pk,
+            "username": self.user.username,
             "content": self.content
         }

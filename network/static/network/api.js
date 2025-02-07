@@ -87,3 +87,21 @@ async function put_post(post_id, new_content) {
         throw error;
     });
 }
+
+async function post_comment(post_id, content) {
+    return fetch('/posts/comments', {
+        method: 'POST',
+        body: JSON.stringify({
+            post_id: post_id,
+            content: content
+        })
+    })
+    .then(response => response.json())
+    .then(result => {
+        return result;
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        throw error;
+    });
+}
