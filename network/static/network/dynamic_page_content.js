@@ -10,7 +10,7 @@ const LIKED_POST = '\
 
 const BODY_POST =  ' \
 <div class="card border-primary mb-3 d-block mx-auto"> \
-    <div class="card-header card-header-link btn w-100 text-start" onclick="show_profile(\'#USER_ID#\')">#USERNAME#</div> \
+    <div class="card-header card-header-link btn w-100 text-start" onclick="show_profile(\'#USER_ID#\')"><strong>#USERNAME#</strong></div> \
     <div class="card-body text-secondary"> \
         <button class="btn btn-primary btn-sm edit-btn" onclick="handle_edit_click(this, #POST_ID#)" #SHOW_BUTTON#>Edit</button> \
         <div class="my-2 text-black post-body">#POSTBODY#</div> \
