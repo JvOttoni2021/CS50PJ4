@@ -10,12 +10,11 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
     });
     const new_post_button = document.querySelector("#new-post-modal-button");
-    if (!new_post_button === undefined) {
+    if (new_post_button != null) {
         document.querySelector("#new-post-modal-button").addEventListener('click', () => clear_new_post());
     }
     const nav = document.querySelector("#following-posts-nav");
-    
-    if (!nav === undefined) {
+    if (nav != null) {
         document.querySelector("#following-posts-nav").addEventListener('click', () => open_following_posts());
     }
 });
@@ -62,16 +61,12 @@ async function handle_like_click(button, post_id) {
 
     if (likeCount.dataset.liked === "true") {
         let new_count = parseInt(likeCount.innerHTML) - 1;
-        console.log(new_count);
-        console.log(likeCount.innerHTML);
         likeCount.innerHTML = new_count;
         
         like_icon.innerHTML = UNLIKED_POST;
         likeCount.dataset.liked = "false";
     } else {
         let new_count = parseInt(likeCount.innerHTML) + 1;
-        console.log(new_count);
-        console.log(likeCount.innerHTML);
         likeCount.textContent = new_count;
         
         like_icon.innerHTML = LIKED_POST;

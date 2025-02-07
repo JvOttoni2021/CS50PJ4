@@ -49,7 +49,6 @@ function get_body(post) {
     let comments = "";
 
     post.comments.forEach(element => {
-        console.log("teste");
         comments = comments + get_formatted_comment(element.username, element.content, post.id);
     });
     
